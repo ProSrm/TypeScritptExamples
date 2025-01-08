@@ -160,3 +160,77 @@ interface User {
 // Using Required to make name mandatory
 const completeUser: Required<User> = { id: 1, name: 'Alice' };  // name is now required
 
+4>Enum Types 
+
+enum Theme {
+  Light = 'light',
+  Dark = 'dark',
+  System = 'system'
+}
+
+interface ThemeProps {
+  currentTheme: Theme;
+  onThemeChange: (theme: Theme) => void;
+}
+
+function ThemeSelector({ currentTheme, onThemeChange }: ThemeProps) {
+  return (
+    <select value={currentTheme} onChange={e => onThemeChange(e.target.value as Theme)}>
+      <option value={Theme.Light}>Light</option>
+      <option value={Theme.Dark}>Dark</option>
+      <option value={Theme.System}>System</option>
+    </select>
+  );
+}
+
+5> Intersection Types 
+type BaseProps = {
+  className?: string;
+  style?: React.CSSProperties;
+}
+
+type ButtonProps = BaseProps & {
+  onClick: () => void;
+  label: string;
+}
+
+// Component with combined types
+const Button = ({ onClick, label, className, style }: ButtonProps) => {
+  return (
+    <button onClick={onClick} className={className} style={style}>
+      {label}
+    </button>
+  );
+}
+
+6>Type Guards
+Usecase : 
+A type guard function in TypeScript is a 
+specialized function that narrows down the type of a variable within a certain scope, helping TypeScript understand the specific type of a
+ variable when there are multiple possible types.
+
+interface AdminUser {
+  type: 'admin';
+  adminPermissions: string[];
+}
+
+interface RegularUser {
+  type: 'regular';
+  subscriptionTier: string;
+}
+
+type User = AdminUser | RegularUser;
+
+// Type guard function
+function isAdmin(user: User): user is AdminUser {
+  return user.type === 'admin';
+}
+
+function UserPermissions({ user }: { user: User }) {
+  if (isAdmin(user)) {
+    // TypeScript knows user is AdminUser here
+    return <div>Admin permissions: {user.adminPermissions.join(', ')}</div>;
+  }
+  // TypeScript knows user is RegularUser here
+  return <div>Subscription: {user.subscriptionTier}</div>;
+}
