@@ -1,0 +1,162 @@
+
+1>Type and interface for the Props 
+// Basic type definition
+type ButtonProps = {
+  text: string;
+  onClick: () => void;
+  variant?: 'primary' | 'secondary';
+}
+
+// Or using interface
+interface ButtonProps {
+  text: string;
+  onClick: () => void;
+  variant?: 'primary' | 'secondary';
+}
+
+
+2>Function component Types 
+// Basic functional component
+const Button: React.FC<ButtonProps> = ({ text, onClick, variant = 'primary' }) => {
+  return <button onClick={onClick}>{text}</button>
+}
+
+// Alternative syntax
+function Button({ text, onClick }: ButtonProps) {
+  return <button onClick={onClick}>{text}</button>
+}
+
+3>State and Event Types 
+// State typing
+const [count, setCount] = useState<number>(0);
+
+// Event handling
+const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // ...
+};
+const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  // ...
+};
+
+4> Common React Types 
+
+// Children prop
+type ContainerProps = {
+  children: React.ReactNode;
+}
+
+// Ref typing
+const inputRef = useRef<HTMLInputElement>(null);
+
+// Style props
+type StyleProps = {
+  style?: React.CSSProperties;
+}
+
+5> Union Types and Optional Properties 
+
+type Status = 'idle' | 'loading' | 'success' | 'error';
+
+interface UserProps {
+  name: string;
+  age?: number;  // Optional property
+  role: 'admin' | 'user';
+}
+
+
+:::::::::::::::::::: Advanced Concepts :::::::::::::::::::::::
+
+1> Generics Types for Reusable Components 
+// A reusable list component that can work with any data type
+interface ListProps<T> {
+  items: T[];
+  renderItem: (item: T) => React.ReactNode;
+}
+
+function List<T>({ items, renderItem }: ListProps<T>) {
+  return (
+    <ul>
+      {items.map((item, index) => (
+        <li key={index}>{renderItem(item)}</li>
+      ))}
+    </ul>
+  );
+}
+
+// Usage
+interface User {
+  id: number;
+  name: string;
+}
+
+// Define the users array
+const users: User[] = [
+  { id: 1, name: 'Alice' },
+  { id: 2, name: 'Bob' },
+  { id: 3, name: 'Charlie' },
+];
+
+// Use the List component
+<List<User> 
+  items={users} 
+  renderItem={(user) => <span>{user.name}</span>} 
+/>
+
+2>Type Assertions : manually bypass the type checking of TypeScritpt :
+use: when you as user pretty sure about datatype 
+for e.g by default getElementById return HTMLElement, when you know that particular element 
+is button or any other then it should be used. 
+
+// When you know more about the type than TypeScript
+const canvas = document.getElementById('canvas') as HTMLCanvasElement;
+
+// Alternative syntax
+const input = <HTMLInputElement>document.getElementById('input');
+
+// Assertion in React
+interface Props {
+  data: unknown;
+}
+
+function DataDisplay({ data }: Props) {
+  const user = data as { name: string; age: number };
+  return <div>{user.name}</div>;
+}
+
+3> Utility Types in TypeScript
+Utility types in TypeScript are built-in types that provide common 
+transformations and manipulations of types. 
+These utility types can help simplify complex type definitions, 
+enhance reusability, and improve type safety in your code.
+
+i)Partial - Makes all properties optional
+interface User {
+  name: string;
+  age: number;
+  email: string;
+}
+
+const updateUser = (user: Partial<User>) => {
+  setUser((prevUser) => ({ ...prevUser, ...user }));
+};
+
+
+// Pick - Creates a new type with only specified properties
+type UserNameAndEmail = Pick<User, 'name' | 'email'>;
+
+// Omit - Creates a new type without specified properties
+type UserWithoutEmail = Omit<User, 'email'>;
+
+// Record - Creates an object type with specified keys and value type
+type UserRoles = Record<'admin' | 'user' | 'guest', string[]>;
+
+ii)Required 
+
+interface User {
+  id: number;
+  name?: string;
+}
+
+// Using Required to make name mandatory
+const completeUser: Required<User> = { id: 1, name: 'Alice' };  // name is now required
+
